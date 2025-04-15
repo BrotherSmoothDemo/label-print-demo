@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Brother Label Printer Demo</title>
+  <script src="https://www.brother.co.jp/dev/webapi/smoothprint/latest/smoothprint.js"></script>
+</head>
+<body>
+  <h1>Brother SmoothPrint Demo</h1>
+
+  <label for="name">Name to Print:</label>
+  <input type="text" id="name" value="John Doe">
+  <button onclick="printLabel()">Print Label</button>
+
+  <script>
+    async function printLabel() {
+      const name = document.getElementById('name').value;
+
+      try {
+        const device = await BrotherSmoothPrint.selectDevice();
+        const printer = await BrotherSmoothPrint.getPrinter(device);
+
+        const response = await fetch('label_template.lbx');
+        const blob = await response.blob();
+
+        const template = await printer.loadLabelTemplate(blob);
+        template.setData({ "Shipping Label - TD4 Label Sample.lbx": name }); // Replace "Name" with your field name
+
+        await printer.print(template);
+        alert("Label sent to printer!");
+      } catch (err) {
+        console.error(err);
+        alert("Error printing: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
